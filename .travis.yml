@@ -1,0 +1,34 @@
+os: windows
+sudo: false
+language: cpp
+
+addons:
+  sonarcloud:
+    organization: "sonarcloud"
+    token:
+      secure: "Kd2zw194TU2GD6hsJYe/ECu8cfzW1V8woSOAzR1IA/AZoGnUZv1jbyf07T8McgZyHDg81hvrZvDrnYb7FBO7yvLQMgEXlpTg5o88WfXDM85XrYmF7bexxyDMH95yf2sVFLCqyge9z84H/Yj/CuO43ABZFfHGWigBUKW1ZaMAM6awH6W3DvRsMxXWcbjeQgP+BlxgaCbhPbK2oPTFkFtG7qdxUnz5+lCIxW/VmAwATeUdVnRwPseCBepC4zguyEn8YAI4LibPnUnVoYF0itK99eEMqcVsOjELeGPH1x5GDFvrF6JgMSkXwTY1RlskqjLZ1XYdUagXfgmuaPgdjrW157hUWuE0yW/xMFysrYb20RJxJRKlu4Riu2jQvqvyPdMtDFUd/kVsANYaZAx62hbCbIZKUhQcfn6o+BovbD1WpS0pUDZXH8un0q2iA872OHCMJQLYL+dtNLAYF/SMEBbCY3UB89JC5cmcy+ft+FtKgAMHz1uxxgLa+B9gWacYxX1tgL+nUT5LyXjP+qeI+VpYa7VXEuRCB2eyG6NsSDp/3YYYd3sHltmRInMZ+bT9Xlu5qN1svvFhKnzLch7tFkzelzJutGlRUiYC3Gw4Rs8msWAgwE9U+3CBJkCQ9C3b4uSzMibR6a1Xw2yKx1rR0e2GQBgMY5E0D0Dw2r10P/+gs4U="
+
+script:
+  # windows requires a few extra steps
+    # Install java
+  - export JAVA_HOME=${JAVA_HOME:-/c/jdk}
+  - export PATH=${JAVA_HOME}/bin:${PATH}
+  - choco install jdk8 -params 'installdir=c:\\jdk' -y
+    # Download build-wrapper
+  - curl "https://sonarcloud.io/static/cpp/build-wrapper-win-x86.zip" --output build-wrapper-win-x86.zip
+  - unzip build-wrapper-win-x86.zip
+  # Prepare the build system
+  - mkdir build
+  - cd build
+  - cmake ..
+  - cd ..
+  # Wraps the compilation with the Build Wrapper to generate configuration (used
+  # later by the SonarQube Scanner) into the "bw-output" folder
+  - build-wrapper-win-x86/build-wrapper-win-x86-64.exe --out-dir bw-output cmake --build build/
+  # And finally run the SonarQube analysis - read the "sonar-project.properties"
+  # file to see the specific configuration
+  - ${TRAVIS_HOME}/.sonarscanner/sonar-scanner/bin/sonar-scanner.bat
+
+cache:
+  directories:
+    - '$HOME/.sonar/cache'
