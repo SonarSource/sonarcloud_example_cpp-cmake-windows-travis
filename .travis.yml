@@ -11,9 +11,9 @@ addons:
 script:
   # windows requires a few extra steps
     # Install java
-  - export JAVA_HOME=${JAVA_HOME:-/c/jdk}
+  - export JAVA_HOME=${JAVA_HOME:-'/c/Program Files/OpenJDK/openjdk-11.0.7_10'}
   - export PATH=${JAVA_HOME}/bin:${PATH}
-  - choco install jdk8 -params 'installdir=c:\\jdk' -y
+  - choco install openjdk11 -y --version 11.0.7.10
     # Download build-wrapper
   - curl "https://sonarcloud.io/static/cpp/build-wrapper-win-x86.zip" --output build-wrapper-win-x86.zip
   - unzip build-wrapper-win-x86.zip
